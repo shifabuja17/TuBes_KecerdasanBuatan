@@ -1,0 +1,15 @@
+# ── File Rahasia & Konfigurasi (SANGAT PENTING) ──
+.env
+.streamlit/secrets.toml
+config.json
+credentials.json
+
+# ── Folder Virtual Environment Python ──
+venv/
+env/
+.venv/
+
+# ── File Sistem & Cache Python ──
+__pycache__/
+*.pyc
+.DS_Store
