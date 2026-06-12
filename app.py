@@ -42,9 +42,17 @@ st.markdown("""
     --radius: 16px;
 }
 
-html, body, [class*="st-"] {
+html, body, .stApp {
     font-family: 'Inter', sans-serif !important;
 }
+
+[data-testid="collapsedControl"] span,
+[data-testid="collapsedControl"] div,
+[data-testid="collapsedControl"] svg,
+.material-symbols-rounded,
+.stIcon {
+    font-family: "Material Symbols Rounded", "Material Icons" !important;
+}      
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Outfit', sans-serif !important;
