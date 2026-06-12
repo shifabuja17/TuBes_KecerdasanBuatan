@@ -3,6 +3,7 @@ import google.generativeai as genai
 import pandas as pd
 import datetime
 import re
+import streamlit.components.v1 as components
 
 # ──────────────────────────────────────────────────────────
 # Page Config
@@ -665,6 +666,123 @@ with tab3:
             unsafe_allow_html=True,
         )
 
+        # --- TAMBAHAN TIMER PERNAPASAN KOTAK OTOMATIS ---
+        with st.expander("🫁 Buka Latihan Pernapasan Kotak"):
+            components.html(
+                """
+                <div style="font-family: 'Inter', sans-serif; text-align: center; padding: 15px; background: #ffffff; border-radius: 12px; border: 1px solid #E8E0F0; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; overflow: hidden;">
+                    
+                    <div id="cycle-text" style="font-size: 0.95rem; color: #7B7B9E; font-weight: 500;">Siklus: 0 / 6</div>
+                    
+                    <div style="height: 160px; display: flex; align-items: center; justify-content: center; position: relative;">
+                        <!-- Lingkaran Animasi -->
+                        <div id="breath-circle" style="width: 100px; height: 100px; background: #E8E0F0; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 4s linear; box-shadow: 0 4px 15px rgba(155, 142, 196, 0.3);">
+                            <div id="time-sec" style="font-size: 2rem; font-weight: 700; color: #4A4A6A;">4</div>
+                        </div>
+                    </div>
+                    
+                    <div id="phase-text" style="font-size: 1.1rem; font-weight: 600; color: #9B8EC4; margin-bottom: 10px;">Siap Latihan</div>
+                    
+                    <button onclick="toggleBreathing()" id="btn-breath" style="background: #7C9CBF; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; width: 160px; transition: background 0.3s;">Mulai Latihan</button>
+                    
+                </div>
+
+                <script>
+                    let timerId;
+                    let isBreathing = false;
+                    let phaseIndex = 0; // 0: Tarik, 1: Tahan 1, 2: Buang, 3: Tahan 2
+                    let cycleCount = 1;
+                    let secondsLeft = 4;
+
+                    // Konfigurasi visual untuk tiap fase
+                    const phases = [
+                        { name: "Tarik Napas 🌬️", color: "#D4EDDA", scale: "scale(1.5)" }, // Membesar (Hijau Pastel)
+                        { name: "Tahan Napas ⏸️", color: "#FDDCB5", scale: "scale(1.5)" }, // Tetap besar (Peach Pastel)
+                        { name: "Buang Napas 🌊", color: "#D6EAF8", scale: "scale(1)" },   // Mengecil (Biru Pastel)
+                        { name: "Tahan Kosong ⏸️", color: "#E8E0F0", scale: "scale(1)" }   // Tetap kecil (Ungu Pastel)
+                    ];
+
+                    function toggleBreathing() {
+                        let btn = document.getElementById('btn-breath');
+                        if (isBreathing) {
+                            // Hentikan Latihan
+                            clearInterval(timerId);
+                            isBreathing = false;
+                            btn.innerText = "Mulai Latihan";
+                            btn.style.background = "#7C9CBF";
+                            btn.style.color = "white";
+                            resetUI();
+                        } else {
+                            // Mulai Latihan
+                            isBreathing = true;
+                            btn.innerText = "Berhenti";
+                            btn.style.background = "#FADBD8";
+                            btn.style.color = "#922B21";
+                            
+                            cycleCount = 1;
+                            phaseIndex = 0;
+                            secondsLeft = 4;
+                            applyPhaseUI(); // Terapkan fase pertama segera
+                            
+                            timerId = setInterval(() => {
+                                secondsLeft--;
+                                if (secondsLeft <= 0) {
+                                    phaseIndex++; // Pindah ke fase berikutnya
+                                    if (phaseIndex > 3) {
+                                        phaseIndex = 0; // Ulangi dari Tarik Napas
+                                        cycleCount++;
+                                        if (cycleCount > 6) {
+                                            // Latihan selesai setelah 6 siklus
+                                            clearInterval(timerId);
+                                            isBreathing = false;
+                                            btn.innerText = "Mulai Latihan";
+                                            btn.style.background = "#7C9CBF";
+                                            btn.style.color = "white";
+                                            
+                                            // Mainkan suara notifikasi
+                                            let audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+                                            audio.play();
+                                            
+                                            setTimeout(() => {
+                                                alert("Bagus sekali! Latihan pernapasan 6 siklus telah selesai 🌱. Semoga kamu merasa lebih tenang.");
+                                                resetUI();
+                                            }, 500);
+                                            return;
+                                        }
+                                    }
+                                    secondsLeft = 4; // Reset waktu per fase
+                                    applyPhaseUI();
+                                }
+                                document.getElementById('time-sec').innerText = secondsLeft;
+                            }, 1000);
+                        }
+                    }
+
+                    function applyPhaseUI() {
+                        document.getElementById('cycle-text').innerText = `Siklus: ${cycleCount} / 6`;
+                        document.getElementById('phase-text').innerText = phases[phaseIndex].name;
+                        document.getElementById('time-sec').innerText = secondsLeft;
+                        
+                        // Terapkan animasi CSS (warna dan ukuran berubah perlahan selama 4 detik)
+                        let circle = document.getElementById('breath-circle');
+                        circle.style.backgroundColor = phases[phaseIndex].color;
+                        circle.style.transform = phases[phaseIndex].scale;
+                    }
+
+                    function resetUI() {
+                        document.getElementById('cycle-text').innerText = "Siklus: 0 / 6";
+                        document.getElementById('phase-text').innerText = "Siap Latihan";
+                        document.getElementById('time-sec').innerText = "4";
+                        
+                        let circle = document.getElementById('breath-circle');
+                        circle.style.transform = "scale(1)";
+                        circle.style.backgroundColor = "#E8E0F0";
+                    }
+                </script>
+                """,
+                height=300,
+            )
+
     with col2:
         st.markdown(
             """
@@ -687,6 +805,107 @@ with tab3:
             """,
             unsafe_allow_html=True,
         )
+        
+        # --- TAMBAHAN TIMER POMODORO OTOMATIS ---
+        with st.expander("⏱️ Buka Timer Pomodoro"):
+            components.html(
+                """
+                <div style="font-family: 'Inter', sans-serif; text-align: center; padding: 15px; background: #ffffff; border-radius: 12px; border: 1px solid #E8E0F0;">
+                    <div id="phase" style="font-size: 1.2rem; font-weight: 700; color: #9B8EC4; margin-bottom: 5px;">🎯 Siap Fokus</div>
+                    <div id="cycle" style="font-size: 0.9rem; color: #7B7B9E; margin-bottom: 10px;">Siklus: 0 / 4</div>
+                    <h2 id="time" style="font-size: 3.2rem; color: #4A4A6A; margin: 0;">25:00</h2>
+                    
+                    <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
+                        <button onclick="toggleTimer()" id="btn-toggle" style="background: #9B8EC4; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; width: 140px;">Mulai Siklus</button>
+                        <button onclick="resetTimer()" style="background: #FADBD8; color: #922B21; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem;">Reset</button>
+                    </div>
+                </div>
+
+                <script>
+                    let timer;
+                    let timeLeft = 25 * 60; // Default 25 menit
+                    let isRunning = false;
+                    let currentPhase = 'Fokus'; // Status: Fokus, Jeda Pendek, Jeda Panjang
+                    let cycleCount = 0;
+
+                    function updateDisplay() {
+                        let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                        let s = (timeLeft % 60).toString().padStart(2, '0');
+                        document.getElementById('time').innerText = m + ":" + s;
+                        
+                        let phaseText = currentPhase === 'Fokus' ? '🎯 Fase Fokus' : (currentPhase === 'Jeda Pendek' ? '☕ Jeda Pendek' : '🛋️ Jeda Panjang');
+                        document.getElementById('phase').innerText = phaseText;
+                        document.getElementById('cycle').innerText = `Siklus: ${cycleCount} / 4`;
+                    }
+
+                    function toggleTimer() {
+                        if (isRunning) {
+                            // Pause
+                            clearInterval(timer);
+                            isRunning = false;
+                            document.getElementById('btn-toggle').innerText = "Lanjut";
+                            document.getElementById('btn-toggle').style.background = "#82C9A1"; // Hijau saat pause agar siap dilanjut
+                        } else {
+                            // Start / Resume
+                            isRunning = true;
+                            document.getElementById('btn-toggle').innerText = "Jeda (Pause)";
+                            document.getElementById('btn-toggle').style.background = "#FDCB6E"; // Kuning peringatan saat berjalan
+                            
+                            timer = setInterval(() => {
+                                if (timeLeft > 0) {
+                                    timeLeft--;
+                                    updateDisplay();
+                                } else {
+                                    handlePhaseSwitch();
+                                }
+                            }, 1000);
+                        }
+                    }
+
+                    function handlePhaseSwitch() {
+                        // Mainkan suara notifikasi
+                        let audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+                        audio.play();
+
+                        if (currentPhase === 'Fokus') {
+                            cycleCount++;
+                            if (cycleCount >= 4) {
+                                currentPhase = 'Jeda Panjang';
+                                timeLeft = 15 * 60; // 15 Menit
+                                cycleCount = 0; // Reset siklus untuk ronde berikutnya
+                                alert("Kerja bagus! 4 siklus telah selesai. Nikmati istirahat panjang 15 menit 🌱");
+                            } else {
+                                currentPhase = 'Jeda Pendek';
+                                timeLeft = 5 * 60; // 5 Menit
+                                alert("Waktu fokus habis! Silakan istirahat sejenak 5 menit ☕");
+                            }
+                        } else {
+                            // Berasal dari Jeda Pendek ATAU Jeda Panjang
+                            currentPhase = 'Fokus';
+                            timeLeft = 25 * 60; // 25 Menit
+                            alert("Waktu istirahat selesai! Yuk kembali fokus 25 menit 🎯");
+                        }
+                        updateDisplay();
+                    }
+
+                    function resetTimer() {
+                        clearInterval(timer);
+                        isRunning = false;
+                        currentPhase = 'Fokus';
+                        cycleCount = 0;
+                        timeLeft = 25 * 60;
+                        
+                        document.getElementById('btn-toggle').innerText = "Mulai Siklus";
+                        document.getElementById('btn-toggle').style.background = "#9B8EC4";
+                        updateDisplay();
+                    }
+                    
+                    // Inisialisasi tampilan awal
+                    updateDisplay();
+                </script>
+                """,
+                height=260,
+            )
 
     st.markdown("<br>", unsafe_allow_html=True)
 
