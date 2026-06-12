@@ -8,7 +8,7 @@ import re
 # Page Config
 # ──────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="OvercomeAI — Teman Sehat Mentalmu",
+    page_title="AmigoAI — Teman Sehat Mentalmu",
     page_icon="🌿",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -279,7 +279,7 @@ h1, h2, h3, h4, h5, h6 {
 # Gemini Configuration
 # ──────────────────────────────────────────────────────────
 SYSTEM_INSTRUCTION = """
-Kamu adalah "OvercomeAI", seorang konselor sebaya (peer counselor) yang empatik, hangat, dan suportif. 
+Kamu adalah "AmigoAI", seorang konselor sebaya (peer counselor) yang empatik, hangat, dan suportif. 
 Kamu berfokus membantu mahasiswa yang mengalami burnout akademik, kelelahan emosional, dan tekanan perkuliahan.
 
 Panduan perilaku:
@@ -371,7 +371,7 @@ if "questionnaire_submitted" not in st.session_state:
 # ──────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown(
-        "#### 🌿 Tentang OvercomeAI\n"
+        "#### 🌿 Tentang AmigoAI\n"
         "Teman digital untuk membantu mahasiswa "
         "mengatasi burnout akademik dengan empati dan dukungan."
     )
@@ -387,7 +387,7 @@ with st.sidebar:
 st.markdown(
     """
     <div class="hero-header">
-        <h1>🌿 OvercomeAI</h1>
+        <h1>🌿 AmigoAI</h1>
         <p>Teman digitalmu untuk melewati masa-masa sulit perkuliahan</p>
     </div>
     """,
@@ -560,7 +560,7 @@ with tab2:
                 <div class="glass-card" style="text-align:center;padding:2.5rem;">
                     <p style="font-size:2.5rem;margin-bottom:0.5rem;">🌿</p>
                     <p style="font-size:1.05rem;color:#4A4A6A;font-weight:500;">
-                        Hai! Aku OvercomeAI, teman curhatmu.
+                        Hai! Aku AmigoAI, teman curhatmu.
                     </p>
                     <p style="font-size:0.88rem;color:#7B7B9E;">
                         Ceritakan apa pun yang mengganjal di hatimu.<br>
@@ -607,7 +607,7 @@ with tab2:
             )
 
             # Get AI response
-            with st.spinner("🌿 OvercomeAI sedang mengetik..."):
+            with st.spinner("🌿 AmigoAI sedang mengetik..."):
                 ai_response = get_gemini_response(
                     user_input, st.session_state.chat_history[:-1]
                 )
@@ -812,7 +812,7 @@ with tab3:
 st.markdown(
     """
     <div class="footer">
-        🌿 <strong>OvercomeAI</strong> v1.0 — Dibuat dengan 💛 untuk kesehatan mental mahasiswa Indonesia<br>
+        🌿 <strong>AmigoAI</strong> v1.0 — Dibuat dengan 💛 untuk kesehatan mental mahasiswa Indonesia<br>
         <span style="font-size:0.75rem;">⚠️ Aplikasi ini bukan pengganti konseling profesional. 
         Jika kamu membutuhkan bantuan segera, hubungi 119 ext. 8</span>
     </div>
